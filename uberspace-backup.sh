@@ -8,9 +8,24 @@ if [ ! -e "$HOSTS" ]; then echo "Missing hosts file. Please set a correct value 
 
 # Get current date
 DATE=$(date +"%Y-%m-%d_%H-%M")
+LOG="$CURDIR"/uberspace-backup.log
 
 function trim {
   sed -r -e 's/^\s*//g' -e 's/\s*$//g'
+}
+function pdate {
+  DATE=$(date +%y-%m-%d_%H:%M:%S)
+  echo "[$DATE]"
+}
+function logrun {
+  # Write command itself to log, and pipe errors to log
+  echo "$(pdate) $@" >> "$LOG"
+  eval "$@" 2>> "$LOG"
+}
+function logecho {
+  # Echo string and copy it to log while attaching the current date
+  echo "$(pdate) $@"
+  echo "$(pdate) $@" >> "$LOG"
 }
 
 while read line; do
@@ -19,6 +34,8 @@ while read line; do
   RHOST=$(echo "$line" | cut -d";" -f1 | trim)
   RUSER=$(echo "$RHOST" | cut -d"@" -f1)
   ALLRDIR=$(echo "$line" | cut -d";" -f2 | trim)
+  
+  logecho "Starting backup of ${RHOST}"
   
   NORDIR=$(echo $ALLRDIR | grep -o "|" | wc -l)
   NORDIR=$[$NORDIR + 1]
@@ -46,15 +63,17 @@ while read line; do
     # Create backup destination if necessary
     if [ ! -e "${DEST}" ]; then mkdir -p "${DEST}"; fi
     
+    logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
+    
     # RSYNC
-    rsync -avz -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress ${RHOST}:${SOURCE}/ "${DEST}"/
+    logrun rsync -az -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
         
     # Pack backup directory, and delete uncompressed one
     tar cf ${DEST}.tar ${DEST}   # TODO: avoid absolute paths
     rm -rf ${DEST}
     
     # Encrypt archive with GPG (it compresses at the same time)
-    gpg --output ${DEST}.tar.gpg --encrypt --recipient ${GPG} ${DEST}.tar
+    logrun gpg --output ${DEST}.tar.gpg --encrypt --recipient ${GPG} ${DEST}.tar
     rm ${DEST}.tar
     
     # Delete all old directories except the $MAXBAK most recent
