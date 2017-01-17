@@ -48,9 +48,7 @@ while read line; do
     
     # RSYNC
     echo rsync -avz -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" --progress ${RHOST}:${SOURCE}/ "${DEST}"/
-    
-    continue
-    
+        
     # Pack backup directory, and delete uncompressed one
     tar cf ${DEST}.tar ${DEST}   # TODO: avoid absolute paths
     rm -rf ${DEST}
