@@ -58,21 +58,23 @@ while read line; do
     # Create backup destination if necessary
     if [ ! -e "${DEST}" ]; then mkdir -p "${DEST}"; fi
     
-    logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
-    
     # RSYNC
+    logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
     rsync -az -e "ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
         
     # Pack backup directory, and delete uncompressed one
+    logecho "${RHOST}: Archiving $(basename ${DEST})"
     tar cf ${DEST}.tar -C $(echo ${DEST} | sed "s|$(basename ${DEST})$||") $(basename ${DEST}) # TODO: avoid absolute paths
     rm -rf ${DEST}
     
     # Encrypt archive with GPG (it compresses at the same time)
+    logecho "${RHOST}: Encrypting and compressing $(basename ${DEST})"
     gpg --output ${DEST}.tar.gpg --encrypt --recipient ${GPG} ${DEST}.tar
     rm ${DEST}.tar
     
     # Delete all old directories except the $MAXBAK most recent
     if [ $(ls -tp "${BACKUPDIR}"/"${RHOST}"/ | grep '/$' | wc -l) -gt $MAXBAK ]; then
+      logecho "${RHOST}: Removing older backups of $(basename ${DEST})"
       ls -tpd "${BACKUPDIR}"/"${RHOST}"/* | grep '/$' | tail -n +$[$MAXBAK + 1] | xargs -d '\n' rm -r --
     fi
   done
