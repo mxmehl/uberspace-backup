@@ -61,7 +61,7 @@ while read line; do
     logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
     
     # RSYNC
-    rsync -az -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
+    rsync -az -e "ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
         
     # Pack backup directory, and delete uncompressed one
     tar cf ${DEST}.tar -C $(echo ${DEST} | sed "s|$(basename ${DEST})$||") $(basename ${DEST}) # TODO: avoid absolute paths
