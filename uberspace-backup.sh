@@ -42,7 +42,7 @@ while read line; do
     # Set Source directory, and make exception for %mysql
     SOURCE="${RDIR}"
     if [ "${RDIR}" == "mysql" ]; then SOURCE=/mysqlbackup/latest/${RUSER}; fi
-        
+    
     # Create backup destination if necessary
     if [ ! -e "${DEST}" ]; then mkdir -p "${DEST}"; fi
     
@@ -58,8 +58,9 @@ while read line; do
     rm ${DEST}.tar
     
     # Delete all old directories except the $MAXBAK most recent
-    MAXBAK=$[$MAXBAK + 1]
-    ls -tpd "${BACKUPDIR}"/"${RHOST}"/* | grep '/$' | tail -n +$MAXBAK | xargs -d '\n' rm -rv --
+    if [ $(ls -tp "${BACKUPDIR}"/"${RHOST}"/ | grep '/$' | wc -l) -gt $MAXBAK ]; then
+      ls -tpd "${BACKUPDIR}"/"${RHOST}"/* | grep '/$' | tail -n +$[$MAXBAK + 1] | xargs -d '\n' rm -rv --
+    fi
   done
 
 done < "$HOSTS"
