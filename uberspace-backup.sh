@@ -8,7 +8,7 @@ if [ ! -e "$HOSTS" ]; then echo "Missing hosts file. Please set a correct value 
 
 # Get current date
 DATE=$(date +"%Y-%m-%d_%H-%M")
-LOG="$CURDIR"/uberspace-backup.log
+LOG="$CURDIR"/backup.log
 
 function trim {
   sed -r -e 's/^\s*//g' -e 's/\s*$//g'
@@ -16,11 +16,6 @@ function trim {
 function pdate {
   DATE=$(date +%y-%m-%d_%H:%M:%S)
   echo "[$DATE]"
-}
-function logrun {
-  # Write command itself to log, and pipe errors to log
-  echo "$(pdate) $@" >> "$LOG"
-  eval "$@" 2>> "$LOG"
 }
 function logecho {
   # Echo string and copy it to log while attaching the current date
@@ -66,19 +61,19 @@ while read line; do
     logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
     
     # RSYNC
-    logrun rsync -az -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
+    rsync -az -e "ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
         
     # Pack backup directory, and delete uncompressed one
-    tar cf ${DEST}.tar ${DEST}   # TODO: avoid absolute paths
+    tar cf ${DEST}.tar -C $(echo ${DEST} | sed "s|$(basename ${DEST})$||") $(basename ${DEST}) # TODO: avoid absolute paths
     rm -rf ${DEST}
     
     # Encrypt archive with GPG (it compresses at the same time)
-    logrun gpg --output ${DEST}.tar.gpg --encrypt --recipient ${GPG} ${DEST}.tar
+    gpg --output ${DEST}.tar.gpg --encrypt --recipient ${GPG} ${DEST}.tar
     rm ${DEST}.tar
     
     # Delete all old directories except the $MAXBAK most recent
     if [ $(ls -tp "${BACKUPDIR}"/"${RHOST}"/ | grep '/$' | wc -l) -gt $MAXBAK ]; then
-      ls -tpd "${BACKUPDIR}"/"${RHOST}"/* | grep '/$' | tail -n +$[$MAXBAK + 1] | xargs -d '\n' rm -rv --
+      ls -tpd "${BACKUPDIR}"/"${RHOST}"/* | grep '/$' | tail -n +$[$MAXBAK + 1] | xargs -d '\n' rm -r --
     fi
   done
 
