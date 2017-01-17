@@ -1,0 +1,11 @@
+# File with hosts and their backup source paths
+HOSTS="$CURDIR"/hosts.csv
+
+# root dir where backups shall be saved to
+BACKUPDIR=/var/backups/uberspace
+
+# GPG fingerprint of key used for encryption  
+GPG=6775E8DDD8CEABCC83E38CEHE6334BCA29DF8192
+
+# Maximum number of backups that shall be retained (0 to disable automatic deletion)
+MAXBAK=3

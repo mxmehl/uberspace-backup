@@ -1,0 +1,3 @@
+# Username@Hostname; Path1 | Path2 | Path3
+root@server; /home
+user@host.uberspace.de; %virtual | %mysql | /home/user/service
