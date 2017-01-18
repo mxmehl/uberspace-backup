@@ -30,7 +30,7 @@ while read line; do
   RUSER=$(echo "$RHOST" | cut -d"@" -f1)
   ALLRDIR=$(echo "$line" | cut -d";" -f2 | trim)
   
-  logecho "Starting backup of ${RHOST}"
+  logecho "${RHOST}: Starting backups"
   
   NORDIR=$(echo $ALLRDIR | grep -o "|" | wc -l)
   NORDIR=$[$NORDIR + 1]
@@ -80,3 +80,5 @@ while read line; do
   done
 
 done < "$HOSTS"
+
+logecho "Finished all operations."
