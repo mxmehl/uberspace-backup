@@ -47,6 +47,9 @@ while read line; do
     elif [ "${RDIR}" == "%mails" ]; then
       RDIR=/home/${RUSER}/users
       DEST="$BACKUPDIR/$RHOST/$DATE/mails"
+    elif [ "${RDIR}" == "%home" ]; then
+      RDIR=/home/${RUSER}
+      DEST="$BACKUPDIR/$RHOST/$DATE/home"
     else
       DEST="$BACKUPDIR/$RHOST/$DATE/$(basename "${RDIR}")"
     fi
