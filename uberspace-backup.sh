@@ -87,7 +87,7 @@ while read line; do
     
     # RSYNC
     logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
-    rsync -az -e "ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null" ${RHOST}:${SOURCE}/ "${DEST}"/
+    rsync -a -e "ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o Compression=no -T -x" ${RHOST}:${SOURCE}/ "${DEST}"/
         
     # Pack backup directory, and delete uncompressed one
     logecho "${RHOST}: Archiving $(basename ${DEST})"
