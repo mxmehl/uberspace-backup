@@ -48,6 +48,7 @@ function logecho {
 }
 
 while read line; do
+  # if line is a comment, go to next line
   if $(echo "$line" | grep -qE "^\s*#"); then continue; fi
 
   RHOST=$(echo "$line" | cut -d";" -f1 | trim)
@@ -55,6 +56,12 @@ while read line; do
   ALLRDIR=$(echo "$line" | cut -d";" -f2 | trim)
   
   logecho "${RHOST}: Starting backups"
+
+  if ! "${CURDIR}"/ssh-checker.sh "${RHOST}"; then
+    logecho "${RHOST}: ERROR when connecting via SSH. Please run ssh-checker.sh to debug."
+    logecho "${RHOST}: Aborting backup after an error."
+    continue
+  fi
   
   NORDIR=$(echo $ALLRDIR | grep -o "|" | wc -l)
   NORDIR=$[$NORDIR + 1]

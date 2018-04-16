@@ -30,22 +30,35 @@ source "$CURDIR"/config.cfg
 
 if [ ! -e "$HOSTS" ]; then echo "Missing hosts file. Please set a correct value of HOSTS= in your config file. Current value: $HOSTS"; exit 1; fi
 
+ARG1="$1"
+
 function trim {
   sed -r -e 's/^\s*//g' -e 's/\s*$//g'
 }
 
 while read line; do
+  # if line is a comment, go to next line
   if $(echo "$line" | grep -qE "^\s*#"); then continue; fi
 
   RHOST=$(echo "$line" | cut -d";" -f1 | trim)
+
+  if [[ "${ARG1}" != "" ]] && [[ "${ARG1}" != "${RHOST}" ]]; then
+    continue
+  fi
   
   echo "[INFO] Trying ${RHOST}"
   
   STATUS=$(ssh -n -o BatchMode=yes -o ConnectTimeout=5 ${RHOST} "echo -n"; echo $?)
 
   if [ $STATUS != 0 ]; then
-    echo "[ERROR] No SSH login possible for ${RHOST}. Adding public key with password:"
-    cat ~/.ssh/id_rsa.pub | ssh ${RHOST} 'cat >> ~/.ssh/authorized_keys'
+    echo -n "[ERROR] No SSH login possible for ${RHOST}. "
+    if [[ "${ARG1}" != "" ]]; then
+      echo "Aborting."
+      exit 1
+    else
+      echo "Adding public key with password: "
+      cat ~/.ssh/id_rsa.pub | ssh ${RHOST} 'cat >> ~/.ssh/authorized_keys'
+    fi
   else
     echo "[SUCCESS] SSH login possible for ${RHOST}."
   fi
