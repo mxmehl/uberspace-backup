@@ -28,7 +28,7 @@ DATE=$(date +"%Y-%m-%d_%H-%M")
 LOG="$CURDIR"/backup.log
 
 function trim {
-  sed -r -e 's/^\s*//g' -e 's/\s*$//g'
+  sed -r -e 's/^[[:space:]]*//g' -e 's/[[:space:]]*$//g'
 }
 function pdate {
   DATE=$(date +%y-%m-%d_%H:%M:%S)
