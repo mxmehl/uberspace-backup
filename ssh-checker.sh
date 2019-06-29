@@ -1,21 +1,6 @@
 #!/bin/bash
-########################################################################
-#  Copyright (C) 2017 Max Mehl <mail [at] mehl [dot] mx>
-########################################################################
-#  
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#  
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#  
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#  
+#  SPDX-Copyright: 2019 Max Mehl <mail [at] mehl [dot] mx>
+#  SPDX-License-Identifier: GPL-3.0-or-later
 ########################################################################
 #  
 #  Reads hosts file and checks SSH access. If not possible with public 
@@ -28,7 +13,15 @@ CURDIR=$(dirname "$(readlink -f "$0")")
 if [ ! -e "$CURDIR"/config.cfg ]; then echo "Missing config.cfg file. Edit and rename config.cfg.sample"; exit 1; fi
 source "$CURDIR"/config.cfg
 
-if [ ! -e "$HOSTS" ]; then echo "Missing hosts file. Please set a correct value of HOSTS= in your config file. Current value: $HOSTS"; exit 1; fi
+if [ ! -e "${HOSTS}" ]; then echo "Missing hosts file. Please set a correct value of HOSTS= in your config file. Current value: ${HOSTS}"; exit 1; fi
+
+if [ ! -z "${SSH_KEY}" ]; then
+  SSH_KEY_ARG="-i ${SSHKEY}"
+else
+  # defaults
+  SSH_KEY_ARG=""
+  SSH_KEY=~/.ssh/id_rsa
+fi
 
 ARG1="$1"
 
@@ -48,7 +41,7 @@ while read line; do
   
   echo "[INFO] Trying ${RHOST}"
   
-  STATUS=$(ssh -n -o BatchMode=yes -o ConnectTimeout=5 ${RHOST} "echo -n"; echo $?)
+  STATUS=$(ssh -n -o BatchMode=yes -o ConnectTimeout=5 ${SSH_KEY_ARG} ${RHOST} "echo -n"; echo $?)
 
   if [ $STATUS != 0 ]; then
     echo -n "[ERROR] No SSH login possible for ${RHOST}. "
@@ -57,7 +50,7 @@ while read line; do
       exit 1
     else
       echo "Adding public key with password: "
-      cat ~/.ssh/id_rsa.pub | ssh ${RHOST} 'cat >> ~/.ssh/authorized_keys'
+      cat "${SSH_KEY}".pub | ssh ${RHOST} 'cat >> ~/.ssh/authorized_keys'
     fi
   else
     echo "[SUCCESS] SSH login possible for ${RHOST}."

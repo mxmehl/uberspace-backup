@@ -1,21 +1,6 @@
 #!/bin/bash
-########################################################################
-#  Copyright (C) 2017 Max Mehl <mail [at] mehl [dot] mx>
-########################################################################
-#  
-#  This program is free software: you can redistribute it and/or modify
-#  it under the terms of the GNU General Public License as published by
-#  the Free Software Foundation, either version 3 of the License, or
-#  (at your option) any later version.
-#  
-#  This program is distributed in the hope that it will be useful,
-#  but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  GNU General Public License for more details.
-#  
-#  You should have received a copy of the GNU General Public License
-#  along with this program.  If not, see <http://www.gnu.org/licenses/>.
-#  
+#  SPDX-Copyright: 2019 Max Mehl <mail [at] mehl [dot] mx>
+#  SPDX-License-Identifier: GPL-3.0-or-later
 ########################################################################
 #  
 #  Saves specific files and directories from a remote server via SSH. 
@@ -28,7 +13,15 @@ CURDIR=$(dirname "$(readlink -f "$0")")
 if [ ! -e "$CURDIR"/config.cfg ]; then echo "Missing config.cfg file. Edit and rename config.cfg.sample"; exit 1; fi
 source "$CURDIR"/config.cfg
 
-if [ ! -e "$HOSTS" ]; then echo "Missing hosts file. Please set a correct value of HOSTS= in your config file. Current value: $HOSTS"; exit 1; fi
+if [ ! -e "${HOSTS}" ]; then echo "Missing hosts file. Please set a correct value of HOSTS= in your config file. Current value: ${HOSTS}"; exit 1; fi
+
+if [ ! -z "${SSH_KEY}" ]; then
+  SSH_KEY_ARG="-i ${SSHKEY}"
+else
+  # defaults
+  SSH_KEY_ARG=""
+  SSH_KEY=~/.ssh/id_rsa
+fi
 
 # Get current date
 DATE=$(date +"%Y-%m-%d_%H-%M")
@@ -94,7 +87,7 @@ while read line; do
     
     # RSYNC
     logecho "${RHOST}: Downloading ${SOURCE} to ${DEST}"
-    rsync -a -e "ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o Compression=no -T -x" ${RHOST}:${SOURCE}/ "${DEST}"/
+    rsync -a -e "ssh -q -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o Compression=no -T -x ${SSH_KEY_ARG}" ${RHOST}:${SOURCE}/ "${DEST}"/
         
     # Pack backup directory, and delete uncompressed one
     logecho "${RHOST}: Archiving $(basename ${DEST})"

@@ -9,3 +9,6 @@ GPG=6775E8DDD8CEABCC83E38CEHE6334BCA29DF8192
 
 # Maximum number of backups that shall be retained (0 to disable automatic deletion)
 MAXBAK=3
+
+# SSH key
+#SSH_KEY="~/.ssh/mykey_rsa"
