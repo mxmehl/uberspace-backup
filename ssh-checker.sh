@@ -16,7 +16,7 @@ source "$CURDIR"/config.cfg
 if [ ! -e "${HOSTS}" ]; then echo "Missing hosts file. Please set a correct value of HOSTS= in your config file. Current value: ${HOSTS}"; exit 1; fi
 
 if [ ! -z "${SSH_KEY}" ]; then
-  SSH_KEY_ARG="-i ${SSHKEY}"
+  SSH_KEY_ARG="-i ${SSH_KEY}"
 else
   # defaults
   SSH_KEY_ARG=""
