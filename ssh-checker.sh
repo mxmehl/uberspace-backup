@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #  SPDX-Copyright: 2019 Max Mehl <mail [at] mehl [dot] mx>
 #  SPDX-License-Identifier: GPL-3.0-or-later
 ########################################################################
