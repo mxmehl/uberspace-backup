@@ -41,7 +41,7 @@ while read line; do
   
   echo "[INFO] Trying ${RHOST}"
   
-  STATUS=$(ssh -n -o BatchMode=yes -o ConnectTimeout=5 ${SSH_KEY_ARG} ${RHOST} "echo -n"; echo $?)
+  STATUS=$(ssh -n -o StrictHostKeyChecking=no -o BatchMode=yes -o ConnectTimeout=5 ${SSH_KEY_ARG} ${RHOST} "echo -n"; echo $?)
 
   if [ $STATUS != 0 ]; then
     echo -n "[ERROR] No SSH login possible for ${RHOST}. "
