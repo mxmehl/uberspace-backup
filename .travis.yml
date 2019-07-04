@@ -1,0 +1,11 @@
+# SPDX-Copyright: 2019 Free Software Foundation Europe e.V.
+# SPDX-License-Identifier: CC0-1.0
+
+language: minimal
+
+services:
+  - docker
+
+before_install:
+- docker pull fsfe/reuse:0.4.0a1
+- docker run --name reuse -v ${TRAVIS_BUILD_DIR}:/repo fsfe/reuse:0.4.0a1 /bin/sh -c "cd /repo; reuse lint"
