@@ -1,3 +1,8 @@
+<!--
+SPDX-Copyright: 2019 Max Mehl <mail [at] mehl [dot] mx>
+SPDX-License-Identifier: GPL-3.0-or-later
+-->
+
 # Uberspace Backup
 
 This Bash script is able to backup directories from Uberspace users (and also other SSH resources). For Uberspace hosts it can also backup MySQL databases by copying the backups Uberspace cleverly created for you.

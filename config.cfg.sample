@@ -1,3 +1,6 @@
+# SPDX-Copyright: 2019 Max Mehl <mail [at] mehl [dot] mx>
+# SPDX-License-Identifier: CC0-1.0
+
 # File with hosts and their backup source paths
 HOSTS="$CURDIR"/hosts.csv
 

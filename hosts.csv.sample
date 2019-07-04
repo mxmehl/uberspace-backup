@@ -1,3 +1,6 @@
+# SPDX-Copyright: 2019 Max Mehl <mail [at] mehl [dot] mx>
+# SPDX-License-Identifier: CC0-1.0
+
 # Username@Hostname; Path1 | Path2 | Path3
 root@server; /home
 user@host.uberspace.de; %virtual | %mysql | /home/user/service
