@@ -3,6 +3,6 @@
 
 pipeline:
   reuse:
-    image: fsfe/reuse:0.4.0a1
+    image: fsfe/reuse:latest
     commands:
       - reuse lint
